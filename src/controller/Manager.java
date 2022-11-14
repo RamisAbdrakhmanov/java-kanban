@@ -14,7 +14,7 @@ public class Manager {
 
     public void getAllTask() {
         for (Map.Entry<Integer, Object> task : taskHashMap.entrySet()) {
-            System.out.print(task.getKey() +", ");
+            System.out.print(task.getKey() + ", ");
         }
         System.out.println("");
     }

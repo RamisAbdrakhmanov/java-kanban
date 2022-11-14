@@ -3,13 +3,11 @@ package model.task;
 import model.Status;
 
 
-
 public class Task {
     private String name;
     private String info;
     private Status status;
     private int id;
-
 
 
     public Task(String name, String info) {
