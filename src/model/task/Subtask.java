@@ -1,7 +1,7 @@
 package model.task;
 
 public class Subtask extends Task {
-    private final int idEpic; // не знаю почему фина
+    private final int idEpic;
 
     public Subtask(String name, String info, int idEpic) {
         super(name, info);

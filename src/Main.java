@@ -31,18 +31,23 @@ public class Main {
         Subtask subtask3 = new Subtask("Subtask2", "Info test", epic2.getId());
         manager.createTask(subtask3);
 
-        epic1.subtasks.add(subtask1);
-        epic1.subtasks.add(subtask2);
-        epic2.subtasks.add(subtask3);
+        epic1.getSubtasks().add(subtask1);
+        epic1.getSubtasks().add(subtask2);
+        epic2.getSubtasks().add(subtask3);
         manager.getAllTask();
+        System.out.println(manager.getTaskHashMap().get(3));
 
+        Epic epic = (Epic) manager.getTaskHashMap().get(3);
         subtask2.setStatus(Status.DONE);
         manager.changeTask(subtask2);
-        manager.getAllTask();
+        System.out.println("Поменя 1 элемент в Эпике на " + Status.DONE);
+        System.out.println("Статус у Эпика стал: " + epic.getStatus());
+
 
         subtask1.setStatus(Status.DONE);
         manager.changeTask(subtask1);
-        manager.getAllTask();
+        System.out.println("Поменяли все статусы на " + Status.DONE);
+        System.out.println("Статус у Эпика стал: " + epic.getStatus());
 
         manager.deleteTaskById(3);
         manager.getAllTask();
