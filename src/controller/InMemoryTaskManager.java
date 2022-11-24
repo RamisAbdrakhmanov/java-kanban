@@ -2,35 +2,42 @@ package controller;
 
 import model.Status;
 import model.task.*;
+import utils.Manager;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Manager {
-    private Map<Integer, Object> taskHashMap = new HashMap<>();
+public class InMemoryTaskManager implements TaskManager {
+    private Map<Integer, Task> taskHashMap = new HashMap<>(); //хранилище всех задач, где ключем является ID
     private final AtomicInteger nextId = new AtomicInteger();
 
+
+    @Override // показываю все задачи
     public void getAllTask() {
-        for (Map.Entry<Integer, Object> task : taskHashMap.entrySet()) {
+        for (Map.Entry<Integer, Task> task : taskHashMap.entrySet()) {
             System.out.print(task.getKey() + ", ");
         }
-        System.out.println("");
+        System.out.println(" ");
     }
 
+    @Override //очищаю мапу задач
     public void deleteAllTask() {
         taskHashMap.clear();
     }
 
-    public Object getTaskById(int o) {
-        return taskHashMap.getOrDefault(o, "Нет такой задачи");
+    @Override //показываю задачу по ID
+    public void getTaskById(int o) {
+        Manager.getDefaultHistory().addTaskInHistory(taskHashMap.get(o));
+        taskHashMap.get(o);
     }
 
-    public void createTask(Object task) {
-        if (((Task) task).getId() == 0) {
+    @Override //создаю задачу
+    public void createTask(Task task) {
+        if (task.getId() == 0) {
             int id = nextId.incrementAndGet();
-            ((Task) task).setId(id);
+            task.setId(id);
             taskHashMap.put(id, task);
             try {
                 if (task instanceof Subtask) {
@@ -40,11 +47,12 @@ public class Manager {
                 System.out.println("Нульпоинтер = " + e);
             }
         } else {
-            changeTask((Task) task);
+            changeTask(task);
         }
 
     }
 
+    @Override //перезаписываю задачу
     public void changeTask(Task task) {
         if ((task.getId() != 0) || taskHashMap.containsKey(task.getId())) {
             taskHashMap.put(task.getId(), task);
@@ -57,6 +65,23 @@ public class Manager {
         }
     }
 
+    @Override //удалю задачу по ID
+    public void deleteTaskById(int id) {
+        if (taskHashMap.get(id) instanceof Epic) {
+            for (Subtask subtask : ((Epic) taskHashMap.get(id)).getSubtasks()) {
+                taskHashMap.remove(subtask.getId());
+            }
+        }
+        taskHashMap.remove(id);
+
+    }
+
+    @Override //просмотр у эпика отдельного спика сабтаска
+    public List<Subtask> subtasks(Epic epic) {
+        return epic.getSubtasks();
+    }
+
+    //отслеживаю изменения стаса большой задачи, при изменение статуса у подзадачи
     private void changeStatusTask(Epic epic, Subtask subtask) {
         if ((subtask.getStatus().equals(Status.IN_PROGRESS) || subtask.getStatus().equals(Status.DONE))
                 && epic.getStatus().equals(Status.NEW)) {
@@ -70,31 +95,13 @@ public class Manager {
             }
             epic.setStatus(Status.DONE);
         }
-
-
     }
 
-    public List<Subtask> subtasks(Epic epic) {
-        return epic.getSubtasks();
-    }
-
-
-    public void deleteTaskById(int id) {
-        if (taskHashMap.get(id) instanceof Epic) {
-            for (Subtask subtask : ((Epic) taskHashMap.get(id)).getSubtasks()) {
-                taskHashMap.remove(subtask.getId());
-            }
-            taskHashMap.remove(id);
-        } else {
-            taskHashMap.remove(id);
-        }
-    }
-
-    public Map<Integer, Object> getTaskHashMap() {
+    public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
     }
 
-    public void setTaskHashMap(Map<Integer, Object> taskHashMap) {
+    public void setTaskHashMap(Map<Integer, Task> taskHashMap) {
         this.taskHashMap = taskHashMap;
     }
 }
