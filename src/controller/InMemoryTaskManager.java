@@ -29,8 +29,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override //показываю задачу по ID
     public void getTaskById(int o) {
-        Manager.getDefaultHistory().addTaskInHistory(taskHashMap.get(o));
-        taskHashMap.get(o);
+        if (o <= taskHashMap.size()) {
+            taskHashMap.get(o);
+            Manager.getDefaultHistory().addTaskInHistory(taskHashMap.get(o));
+        } else {
+            System.out.println("Возможно данного ID нет в базе" );
+        }
     }
 
     @Override //создаю задачу
