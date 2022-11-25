@@ -5,13 +5,14 @@ import model.task.Subtask;
 import model.task.Task;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
-    void getAllTask();
+    Map<Integer, Task> getAllTask();
 
     void deleteAllTask();
 
-    void getTaskById(int o);
+    Task getTaskById(int o);
 
     void createTask(Task task);
 
@@ -19,6 +20,6 @@ public interface TaskManager {
 
     void deleteTaskById(int id);
 
-    public List<Subtask> subtasks(Epic epic);
+    List<Subtask> subtasks(Epic epic);
 
 }

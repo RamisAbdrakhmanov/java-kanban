@@ -10,16 +10,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryTaskManager implements TaskManager {
+    private final InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
     private Map<Integer, Task> taskHashMap = new HashMap<>(); //хранилище всех задач, где ключем является ID
     private final AtomicInteger nextId = new AtomicInteger();
 
 
     @Override // показываю все задачи
-    public void getAllTask() {
-        for (Map.Entry<Integer, Task> task : taskHashMap.entrySet()) {
-            System.out.print(task.getKey() + ", ");
-        }
-        System.out.println(" ");
+    public Map<Integer, Task> getAllTask() {
+        return taskHashMap;
     }
 
     @Override //очищаю мапу задач
@@ -28,12 +26,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override //показываю задачу по ID
-    public void getTaskById(int o) {
-        if (o <= taskHashMap.size()) {
-            taskHashMap.get(o);
-            Manager.getDefaultHistory().addTaskInHistory(taskHashMap.get(o));
+    public Task getTaskById(int o) {
+        if (taskHashMap.containsKey(o)) {
+            historyManager.addTaskInHistory(taskHashMap.get(o));
+            return taskHashMap.get(o);
         } else {
-            System.out.println("Возможно данного ID нет в базе" );
+            System.out.println("Возможно данного ID нет в базе");
+            return null;
         }
     }
 

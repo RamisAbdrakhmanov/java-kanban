@@ -9,21 +9,17 @@ public class Manager {
     public static InMemoryHistoryManager historyManager;
     public static InMemoryTaskManager taskManager;
 
-    public static HistoryManager getDefaultHistory() {
+    public static InMemoryHistoryManager getDefaultHistory() {
         if (historyManager == null) {
             historyManager = new InMemoryHistoryManager();
-            return historyManager;
-        } else {
-            return historyManager;
         }
+        return historyManager;
     }
 
     public static InMemoryTaskManager isDefault() {
         if (taskManager == null) {
             taskManager = new InMemoryTaskManager();
-            return taskManager;
-        } else {
-            return taskManager;
         }
+        return taskManager;
     }
 }
