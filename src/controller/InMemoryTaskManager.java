@@ -4,6 +4,7 @@ import model.Status;
 import model.task.*;
 import utils.Manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,10 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override // показываю все задачи
-    public Map<Integer, Task> getAllTask() {
-        return taskHashMap;
+    public List <Task> getAllTask() {
+        List<Task> allTask = new ArrayList<>();
+        taskHashMap.forEach((key, value)->allTask.add(value));
+        return allTask;
     }
 
     @Override //очищаю мапу задач

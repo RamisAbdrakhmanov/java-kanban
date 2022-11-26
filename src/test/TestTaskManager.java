@@ -7,9 +7,6 @@ import model.task.Subtask;
 import model.task.Task;
 import utils.Manager;
 
-import java.util.Map;
-
-
 public class TestTaskManager {
 
     public static void main(String[] args) {
@@ -41,10 +38,8 @@ public class TestTaskManager {
         epic1.getSubtasks().add(subtask2);
         epic2.getSubtasks().add(subtask3);
 
-        for (Map.Entry<Integer, Task> taskID : manager1.getAllTask().entrySet()) {
-            System.out.print(taskID.getValue().getId() + ", ");
-        }
-        System.out.println(" ");
+        manager1.getAllTask().forEach(task -> System.out.print(task.getId() + ", "));
+        System.out.println("\n" + "_______________________________________________________");
 
         System.out.println(manager1.getTaskHashMap().get(3));
 
@@ -61,17 +56,13 @@ public class TestTaskManager {
         System.out.println("Статус у Эпика стал: " + epic.getStatus());
 
         manager1.deleteTaskById(3);
-        for (Map.Entry<Integer, Task> taskID : manager1.getAllTask().entrySet()) {
-            System.out.print(taskID.getValue().getId() + ", ");
-        }
-        System.out.println(" ");
+        manager1.getAllTask().forEach(task -> System.out.print(task.getId() + ", "));
+        System.out.println("\n" + "_______________________________________________________");
 
         manager1.deleteAllTask();
         System.out.println("Пусто");
-        for (Map.Entry<Integer, Task> taskID : manager1.getAllTask().entrySet()) {
-            System.out.print(taskID.getValue().getId() + ", ");
-        }
-        System.out.println(" ");
+        manager1.getAllTask().forEach(task -> System.out.print(task.getId() + ", "));
+        System.out.println("\n" + "_______________________________________________________");
 
 
     }

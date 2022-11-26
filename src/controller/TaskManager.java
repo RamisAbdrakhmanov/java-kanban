@@ -5,10 +5,9 @@ import model.task.Subtask;
 import model.task.Task;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TaskManager {
-    Map<Integer, Task> getAllTask();
+    List<Task> getAllTask();
 
     void deleteAllTask();
 
