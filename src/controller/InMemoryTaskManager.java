@@ -18,9 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override // показываю все задачи
     public List <Task> getAllTask() {
-        List<Task> allTask = new ArrayList<>();
-        taskHashMap.forEach((key, value)->allTask.add(value));
-        return allTask;
+        return new ArrayList<>(taskHashMap.values());
     }
 
     @Override //очищаю мапу задач
