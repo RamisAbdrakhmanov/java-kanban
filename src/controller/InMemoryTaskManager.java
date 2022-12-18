@@ -4,10 +4,7 @@ import model.Status;
 import model.task.*;
 import utils.Manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -17,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override // показываю все задачи
-    public List <Task> getAllTask() {
+    public List<Task> getAllTask() {
         return new ArrayList<>(taskHashMap.values());
     }
 
@@ -62,7 +59,6 @@ public class InMemoryTaskManager implements TaskManager {
             taskHashMap.put(task.getId(), task);
             if (task instanceof Subtask) {
                 changeStatusTask((Epic) taskHashMap.get(((Subtask) task).getIdEpic()), (Subtask) task);
-
             }
         } else {
             System.out.println("Объект не имеет id или был когда-то удален.");
@@ -73,9 +69,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int id) {
         if (taskHashMap.get(id) instanceof Epic) {
             for (Subtask subtask : ((Epic) taskHashMap.get(id)).getSubtasks()) {
+                historyManager.remove(subtask.getId());
                 taskHashMap.remove(subtask.getId());
             }
         }
+        historyManager.remove(id);
         taskHashMap.remove(id);
 
     }

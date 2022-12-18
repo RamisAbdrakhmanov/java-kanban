@@ -62,23 +62,30 @@ public class TestHistoryManager {
         manager1.createTask(subtask3);
 
         System.out.println(manager1.getTaskById(5));
+        manager1.getTaskById(11);
         manager1.getTaskById(8);
-        manager1.getTaskById(9);
-        manager1.getTaskById(6);
-        manager1.getTaskById(8);
-        manager1.getTaskById(5);
-        manager1.getTaskById(2);
-        manager1.getTaskById(5);
-        manager1.getTaskById(12);
-        manager1.getTaskById(1);
         manager1.getTaskById(7);
+        manager1.getTaskById(9);
+        manager1.getTaskById(5);
         manager1.getTaskById(4);
+        manager1.getTaskById(10);
+        manager1.getTaskById(2);
+        manager1.getTaskById(14);
+        manager1.getTaskById(1);
+        manager1.getTaskById(6);
+        manager1.getTaskById(6);
+        manager1.getTaskById(15);
         manager1.getTaskById(8);
-        manager1.getTaskById(4);
         manager1.getTaskById(3);
-        manager1.getTaskById(17);
+        manager1.getTaskById(2);
+        manager1.getTaskById(4);
 
         InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
+        historyManager.getHistory().forEach(s -> System.out.print(s.getId() + ", "));
+        System.out.println(" ");
+
+        manager1.deleteTaskById(starWars.getId());
+
         historyManager.getHistory().forEach(s -> System.out.print(s.getId() + ", "));
 
     }

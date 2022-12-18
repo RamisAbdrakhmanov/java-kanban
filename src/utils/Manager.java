@@ -1,6 +1,5 @@
 package utils;
 
-import controller.HistoryManager;
 import controller.InMemoryHistoryManager;
 import controller.InMemoryTaskManager;
 

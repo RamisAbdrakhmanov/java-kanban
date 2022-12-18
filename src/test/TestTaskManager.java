@@ -46,14 +46,14 @@ public class TestTaskManager {
         Epic epic = (Epic) (manager1.getTaskHashMap().get(3));
         subtask2.setStatus(Status.DONE);
         manager1.changeTask(subtask2);
-        System.out.println("Поменя 1 элемент в Эпике на " + Status.DONE);
-        System.out.println("Статус у Эпика стал: " + epic.getStatus());
+        System.out.println("Поменя Subtask элемент в Epic на " + Status.DONE);
+        System.out.println("Статус у Epic стал: " + epic.getStatus());
 
 
         subtask1.setStatus(Status.DONE);
         Manager.isDefault().changeTask(subtask1);
-        System.out.println("Поменяли все статусы на " + Status.DONE);
-        System.out.println("Статус у Эпика стал: " + epic.getStatus());
+        System.out.println("Поменяли все статусы Subtask на " + Status.DONE);
+        System.out.println("Статус у Epic стал: " + epic.getStatus());
 
         manager1.deleteTaskById(3);
         manager1.getAllTask().forEach(task -> System.out.print(task.getId() + ", "));
@@ -63,7 +63,5 @@ public class TestTaskManager {
         System.out.println("Пусто");
         manager1.getAllTask().forEach(task -> System.out.print(task.getId() + ", "));
         System.out.println("\n" + "_______________________________________________________");
-
-
     }
 }
