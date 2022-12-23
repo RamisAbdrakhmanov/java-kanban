@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static jdk.nashorn.internal.runtime.ECMAErrors.getMessage;
+
 public class InMemoryHistoryManager implements HistoryManager {
-    transient int size;
+    private int size;
     transient InMemoryHistoryManager.Node first;
     transient InMemoryHistoryManager.Node last;
 
-    HashMap<Integer, Node> history = new HashMap<>(); //история поиска задач*/
+    private final HashMap<Integer, Node> history = new HashMap<>(); //история поиска задач*/
 
     @Override //удалить элемент из истории просмотра
     public void remove(int id) {
@@ -33,16 +35,16 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
             x.item = null;
             --size;
+            history.remove(id); // добавил удаление из истории при удалении из списка
         } catch (Exception o) {
-            System.out.println("Error remove by id in History: " + o);
+            getMessage("Error remove by id in History: " + o);
         }
 
     }
 
     @Override //показать историю поиска задач
     public List<Task> getHistory() {
-        ArrayList<Task> tasks = new ArrayList<>();
-        return getTasks(tasks, last);
+        return getTasks();
     }
 
     @Override //записать в список истории поиска задач
@@ -54,7 +56,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         history.put(task.getId(), last);
     }
 
-    void linkLast(Task task) {
+    private void linkLast(Task task) {
         try {
             Node l = last;
             Node newNode = new Node(l, task, null);
@@ -66,21 +68,23 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
             ++size;
         } catch (Exception e) {
-            System.out.println("Error adding ti history: " + e);
+            getMessage("Error adding in History: " + e);
         }
 
     }
 
-    ArrayList<Task> getTasks(ArrayList<Task> tasks, Node node) {
-        if (node.prev != null) {
-            tasks.add(node.item);
-            Node next = node.prev;
-            getTasks(tasks, next);
-        } else {
-            tasks.add(node.item);
-            return tasks;
+    private ArrayList<Task> getTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        Node l = last;
+        while (l != null) {
+            if (l.prev != null) {   // убрал рекурсию
+                tasks.add(l.item);
+                l = l.prev;
+            } else {
+                tasks.add(l.item);
+                return tasks;
+            }
         }
-
         return tasks;
     }
 

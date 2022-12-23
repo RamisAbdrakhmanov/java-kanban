@@ -41,6 +41,7 @@ public class TestHistoryManager {
 
         Epic harryPotter = new Epic("Хогвартс", "заданья на год");
         manager1.createTask(harryPotter);
+
         Subtask subtask = new Subtask("Зельеваренье"
                 , "варим оборотное зелье"
                 , harryPotter.getId());
@@ -86,6 +87,10 @@ public class TestHistoryManager {
 
         manager1.deleteTaskById(starWars.getId());
 
+        historyManager.getHistory().forEach(s -> System.out.print(s.getId() + ", "));
+        System.out.println(" ");
+
+        historyManager.remove(8);
         historyManager.getHistory().forEach(s -> System.out.print(s.getId() + ", "));
 
     }
