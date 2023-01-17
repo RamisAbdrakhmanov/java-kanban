@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryTaskManager implements TaskManager {
     private final InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
-    private Map<Integer, Task> taskHashMap = new HashMap<>(); //хранилище всех задач, где ключем является ID
-    private final AtomicInteger nextId = new AtomicInteger();
+    private Map<Integer, Task> taskHashMap = new HashMap<>(); //хранилище всех задач, где ключом является ID
+    private  AtomicInteger nextId = new AtomicInteger();
 
 
     @Override // показываю все задачи
@@ -42,7 +42,9 @@ public class InMemoryTaskManager implements TaskManager {
             taskHashMap.put(id, task);
             try {
                 if (task instanceof Subtask) {
-                    ((Epic) taskHashMap.get(((Subtask) task).getIdEpic())).getSubtasks().add((Subtask) task);
+                    int idEpic = ((Subtask) task).getIdEpic();
+                    Epic epic = (Epic) taskHashMap.get(idEpic);
+                    epic.addSubtaskInList((Subtask) task);
                 }
             } catch (Exception e) {
                 System.out.println("Нульпоинтер = " + e);
@@ -69,11 +71,15 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int id) {
         if (taskHashMap.get(id) instanceof Epic) {
             for (Subtask subtask : ((Epic) taskHashMap.get(id)).getSubtasks()) {
-                historyManager.remove(subtask.getId());
+                if(historyManager.getMapHistory().containsKey(id)) {
+                    historyManager.remove(subtask.getId());
+                }
                 taskHashMap.remove(subtask.getId());
             }
         }
-        historyManager.remove(id);
+        if(historyManager.getMapHistory().containsKey(id)) {
+            historyManager.remove(id);
+        }
         taskHashMap.remove(id);
 
     }
@@ -83,7 +89,7 @@ public class InMemoryTaskManager implements TaskManager {
         return epic.getSubtasks();
     }
 
-    //отслеживаю изменения стаса большой задачи, при изменение статуса у подзадачи
+    //отслеживаю изменения статуса большой задачи, при изменении статуса у подзадачи
     private void changeStatusTask(Epic epic, Subtask subtask) {
         if ((subtask.getStatus().equals(Status.IN_PROGRESS) || subtask.getStatus().equals(Status.DONE))
                 && epic.getStatus().equals(Status.NEW)) {
@@ -103,7 +109,17 @@ public class InMemoryTaskManager implements TaskManager {
         return taskHashMap;
     }
 
+
+
     public void setTaskHashMap(Map<Integer, Task> taskHashMap) {
         this.taskHashMap = taskHashMap;
+    }
+
+    public void setNextId(int id) {
+        this.nextId = new AtomicInteger(id);
+    }
+
+    protected void putTaskToTaskHashMap(int id, Task task) {
+        taskHashMap.put(id,task);
     }
 }

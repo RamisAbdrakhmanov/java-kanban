@@ -1,5 +1,6 @@
 package utils;
 
+import controller.FileBackedTasksManager;
 import controller.InMemoryHistoryManager;
 import controller.InMemoryTaskManager;
 
@@ -7,6 +8,7 @@ public class Manager {
 
     public static InMemoryHistoryManager historyManager;
     public static InMemoryTaskManager taskManager;
+    public static FileBackedTasksManager fileManager;
 
     public static InMemoryHistoryManager getDefaultHistory() {
         if (historyManager == null) {
@@ -20,5 +22,12 @@ public class Manager {
             taskManager = new InMemoryTaskManager();
         }
         return taskManager;
+    }
+
+    public static FileBackedTasksManager isDefaultFile() {
+        if (fileManager == null) {
+            fileManager = new FileBackedTasksManager();
+        }
+        return fileManager;
     }
 }

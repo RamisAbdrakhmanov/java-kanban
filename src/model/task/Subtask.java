@@ -1,5 +1,7 @@
 package model.task;
 
+import model.Status;
+
 public class Subtask extends Task {
     private final int idEpic;
 
@@ -7,6 +9,11 @@ public class Subtask extends Task {
         super(name, info);
         this.idEpic = idEpic;
 
+    }
+
+    public Subtask(String name, String info, Status status, int id, int idEpic) {
+        super(name, info, status, id);
+        this.idEpic = idEpic;
     }
 
     public int getIdEpic() {

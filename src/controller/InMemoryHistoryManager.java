@@ -13,7 +13,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     transient InMemoryHistoryManager.Node first;
     transient InMemoryHistoryManager.Node last;
 
-    private final HashMap<Integer, Node> history = new HashMap<>(); //история поиска задач*/
+    private final HashMap<Integer, Node> history = new HashMap<>();
+
+    public HashMap<Integer, Node> getMapHistory() {
+        return history;
+    }
+
 
     @Override //удалить элемент из истории просмотра
     public void remove(int id) {
@@ -99,5 +104,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             this.prev = prev;
         }
     }
+
+
 
 }
