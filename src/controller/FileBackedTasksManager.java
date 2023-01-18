@@ -3,13 +3,13 @@ package controller;
 
 import exteptions.ManagerSaveExceptions;
 import model.Status;
+import model.TaskEnum;
 import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
 import utils.Manager;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,23 +18,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final String filename = "TasksBase";
 
+
     public void save() {
-        try (FileOutputStream outputStream = new FileOutputStream(filename)) {
+        try (BufferedWriter outputStream = new BufferedWriter( new FileWriter(filename))) {
+
             Map<Integer, Task> taskMap = this.getTaskHashMap();
-            LinkedHashMap<Integer, Task> taskLinkedHashMap = taskMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
-                    .collect(Collectors.toMap(Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (e1, e2) -> e1,
-                            LinkedHashMap::new));
-            for (Map.Entry<Integer, Task> taskEntry : taskLinkedHashMap.entrySet()) {
-                Task task = taskEntry.getValue();
-                outputStream.write((toString(task) + "\n").getBytes(StandardCharsets.UTF_8));
+            if(taskMap == null){
+                throw new ManagerSaveExceptions("Нет доступных задач");
             }
-            outputStream.write("\n".getBytes(StandardCharsets.UTF_8));
+            List<Task> tasks = taskMap.values().stream()
+                    .sorted((Comparator.comparing(Task::getId)))
+                    .collect(Collectors.toList());
+            for (Task task: tasks) {
+                outputStream.write((toString(task)));
+                outputStream.newLine();
+            }
+            outputStream.newLine();
 
-            String history = historyToString(historyManager);
+            String history = historyToString();
 
-            outputStream.write(history.getBytes(StandardCharsets.UTF_8));
+            outputStream.write(history);
 
 
         } catch (ManagerSaveExceptions | IOException e) {
@@ -59,11 +62,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    static String historyToString(InMemoryHistoryManager manager) {
+    static String historyToString() {
         List<String> listId = new ArrayList<>();
 
-        for (Task task : manager.getHistory()) {
-            String id = "" + task.getId();
+        for (Task task : FileBackedTasksManager.historyManager.getHistory()) {
+            String id = String.valueOf(task.getId());
             listId.add(id);
         }
 
@@ -91,24 +94,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String[] splitLine = value.split(",");
 
         int id = Integer.parseInt(splitLine[0]);
-        String taskType = splitLine[1];
+        TaskEnum taskType = TaskEnum.valueOf(splitLine[1]);
         String name = splitLine[2];
         Status status = Status.valueOf(splitLine[3]);
         String info = splitLine[4];
         String idEpicStr = splitLine[5];
 
         switch (taskType) {
-            case "TASK":
+            case TASK:
                 Task task = new Task(name, info, status, id);
                 this.putTaskToTaskHashMap(id, task);
                 this.setNextId(id);
                 return task;
-            case "EPIC":
+            case EPIC:
                 Epic epic = new Epic(name, info, status, id);
                 this.putTaskToTaskHashMap(id, epic);
                 this.setNextId(id);
                 return epic;
-            case "SUBTASK":
+            case SUBTASK:
                 int idEpicInt = Integer.parseInt(idEpicStr);
                 Subtask subtask = new Subtask(name, info, status, id, idEpicInt);
                 this.putTaskToTaskHashMap(id, subtask);
@@ -124,34 +127,33 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     //Create line
     public String toString(Task task) {
         String taskStr;
-        if (task instanceof Subtask) {
-            taskStr = String.join(",",
-                    "" + task.getId(),
-                    TaskEnum.SUBTASK + "",
-                    task.getName(),
-                    task.getStatus() + "",
-                    task.getInfo(),
-                    ((Subtask) task).getIdEpic() + "");
-            return taskStr;
-        } else if (task instanceof Epic) {
-            taskStr = String.join(",",
-                    "" + task.getId(),
-                    TaskEnum.EPIC + "",
-                    task.getName(),
-                    task.getStatus() + "",
-                    task.getInfo(),
-                    "-");
-            return taskStr;
-        } else {
-            taskStr = String.join(",",
-                    "" + task.getId(),
-                    TaskEnum.TASK + "",
-                    task.getName(),
-                    task.getStatus() + "",
-                    task.getInfo(),
-                    "-");
-            return taskStr;
+
+
+        switch (task.getTaskEnum()){
+            case SUBTASK:
+                taskStr = String.join(",",
+                        String.valueOf(task.getId()),
+                        String.valueOf(task.getTaskEnum()),
+                        task.getName(),
+                        String.valueOf(task.getStatus()),
+                        task.getInfo(),
+                        String.valueOf(((Subtask) task).getIdEpic()));
+                return taskStr;
+            case EPIC:
+            case TASK:
+                taskStr = String.join(",",
+                        String.valueOf(task.getId()),
+                        String.valueOf(task.getTaskEnum()),
+                        task.getName(),
+                        String.valueOf(task.getStatus()),
+                        task.getInfo(),
+                        "-");
+                return taskStr;
+            default:
+                return null;
+
         }
+
 
     }
 
@@ -169,7 +171,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int o) {
-        return super.getTaskById(o);
+        try {
+            return super.getTaskById(o);
+        } finally {
+            save();
+        }
     }
 
     @Override

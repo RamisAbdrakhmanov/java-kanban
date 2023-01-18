@@ -1,19 +1,22 @@
 package model.task;
 
 import model.Status;
+import model.TaskEnum;
 
 
 public class Task {
-    private String name;
-    private String info;
+    private final String name;
+    private final String info;
     private Status status;
     private int id;
+    private final TaskEnum taskEnum;
 
 
     public Task(String name, String info) {
         this.name = name;
         this.info = info;
         this.status = Status.NEW;
+        this.taskEnum = TaskEnum.TASK;
 
     }
 
@@ -22,6 +25,13 @@ public class Task {
         this.info = info;
         this.status = status;
         this.id = id;
+        if (this instanceof Subtask) {
+            this.taskEnum = TaskEnum.SUBTASK;
+        } else if (this instanceof Epic) {           // не совсем уверен правильно ли это так делать
+            this.taskEnum = TaskEnum.EPIC;
+        } else {
+            this.taskEnum = TaskEnum.TASK;
+        }
     }
 
     public String getName() {
@@ -48,14 +58,9 @@ public class Task {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public TaskEnum getTaskEnum() {
+        return taskEnum;
     }
-
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
 
     @Override
     public String toString() {

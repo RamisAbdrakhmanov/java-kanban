@@ -9,7 +9,6 @@ import java.util.List;
 import static jdk.nashorn.internal.runtime.ECMAErrors.getMessage;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private int size;
     transient InMemoryHistoryManager.Node first;
     transient InMemoryHistoryManager.Node last;
 
@@ -39,7 +38,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                 x.next = null;
             }
             x.item = null;
-            --size;
             history.remove(id); // добавил удаление из истории при удалении из списка
         } catch (Exception o) {
             getMessage("Error remove by id in History: " + o);
@@ -71,7 +69,6 @@ public class InMemoryHistoryManager implements HistoryManager {
             } else {
                 l.next = newNode;
             }
-            ++size;
         } catch (Exception e) {
             getMessage("Error adding in History: " + e);
         }
