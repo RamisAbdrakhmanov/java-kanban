@@ -9,7 +9,7 @@ public class Task {
     private final String info;
     private Status status;
     private int id;
-    private final TaskEnum taskEnum;
+    private TaskEnum taskEnum;
 
 
     public Task(String name, String info) {
@@ -25,13 +25,7 @@ public class Task {
         this.info = info;
         this.status = status;
         this.id = id;
-        if (this instanceof Subtask) {
-            this.taskEnum = TaskEnum.SUBTASK;
-        } else if (this instanceof Epic) {           // не совсем уверен правильно ли это так делать
-            this.taskEnum = TaskEnum.EPIC;
-        } else {
-            this.taskEnum = TaskEnum.TASK;
-        }
+        this.taskEnum = TaskEnum.TASK;
     }
 
     public String getName() {
@@ -60,6 +54,10 @@ public class Task {
 
     public TaskEnum getTaskEnum() {
         return taskEnum;
+    }
+
+    public void setTaskEnum(TaskEnum taskEnum) {
+        this.taskEnum = taskEnum;
     }
 
     @Override

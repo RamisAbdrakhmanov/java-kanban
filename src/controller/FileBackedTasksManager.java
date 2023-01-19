@@ -20,16 +20,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     public void save() {
-        try (BufferedWriter outputStream = new BufferedWriter( new FileWriter(filename))) {
+        try (BufferedWriter outputStream = new BufferedWriter(new FileWriter(filename))) {
 
             Map<Integer, Task> taskMap = this.getTaskHashMap();
-            if(taskMap == null){
-                throw new ManagerSaveExceptions("Нет доступных задач");
-            }
+
             List<Task> tasks = taskMap.values().stream()
                     .sorted((Comparator.comparing(Task::getId)))
                     .collect(Collectors.toList());
-            for (Task task: tasks) {
+            for (Task task : tasks) {
                 outputStream.write((toString(task)));
                 outputStream.newLine();
             }
@@ -40,8 +38,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             outputStream.write(history);
 
 
-        } catch (ManagerSaveExceptions | IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ManagerSaveExceptions(e.getMessage());
         }
     }
 
@@ -129,7 +127,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String taskStr;
 
 
-        switch (task.getTaskEnum()){
+        switch (task.getTaskEnum()) {
             case SUBTASK:
                 taskStr = String.join(",",
                         String.valueOf(task.getId()),
@@ -171,11 +169,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int o) {
-        try {
-            return super.getTaskById(o);
-        } finally {
-            save();
-        }
+        Task task = super.getTaskById(o);
+        save();
+        return task;
+
     }
 
     @Override
