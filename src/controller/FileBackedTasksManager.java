@@ -10,6 +10,7 @@ import model.task.Task;
 import utils.Manager;
 
 import java.io.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,21 +98,23 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Status status = Status.valueOf(splitLine[3]);
         String info = splitLine[4];
         String idEpicStr = splitLine[5];
+        String startTime = splitLine[6];
+        String duration = splitLine[7];
 
         switch (taskType) {
             case TASK:
-                Task task = new Task(name, info, status, id);
+                Task task = new Task(id, name, info, status, startTime, duration);
                 this.putTaskToTaskHashMap(id, task);
                 this.setNextId(id);
                 return task;
             case EPIC:
-                Epic epic = new Epic(name, info, status, id);
+                Epic epic = new Epic(id, name, info, status, startTime, duration);
                 this.putTaskToTaskHashMap(id, epic);
                 this.setNextId(id);
                 return epic;
             case SUBTASK:
                 int idEpicInt = Integer.parseInt(idEpicStr);
-                Subtask subtask = new Subtask(name, info, status, id, idEpicInt);
+                Subtask subtask = new Subtask(id, name, info, status, startTime, duration, idEpicInt);
                 this.putTaskToTaskHashMap(id, subtask);
                 Epic epicSubtask = (Epic) (this.getTaskById(idEpicInt));
                 epicSubtask.addSubtaskInList(subtask);
@@ -125,27 +128,41 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     //Create line
     public String toString(Task task) {
         String taskStr;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
+        String id = String.valueOf(task.getId());
+        String taskEnum = String.valueOf(task.getTaskEnum());
+        String name = task.getName();
+        String status = String.valueOf(task.getStatus());
+        String info = task.getInfo();
+        String startTime = task.getStartTime().format(formatter);
+        String duration = String.valueOf(task.getDuration());
 
         switch (task.getTaskEnum()) {
             case SUBTASK:
                 taskStr = String.join(",",
-                        String.valueOf(task.getId()),
-                        String.valueOf(task.getTaskEnum()),
-                        task.getName(),
-                        String.valueOf(task.getStatus()),
-                        task.getInfo(),
-                        String.valueOf(((Subtask) task).getIdEpic()));
+                        id,
+                        taskEnum,
+                        name,
+                        status,
+                        info,
+                        String.valueOf(((Subtask) task).getIdEpic()),
+                        startTime,
+                        duration);
+
                 return taskStr;
             case EPIC:
             case TASK:
                 taskStr = String.join(",",
-                        String.valueOf(task.getId()),
-                        String.valueOf(task.getTaskEnum()),
-                        task.getName(),
-                        String.valueOf(task.getStatus()),
-                        task.getInfo(),
-                        "-");
+                        id,
+                        taskEnum,
+                        name,
+                        status,
+                        info,
+                        "-",
+                        startTime,
+                        duration);
+
                 return taskStr;
             default:
                 return null;
@@ -176,8 +193,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void createTask(Task task) {
-        super.createTask(task);
+    public void addNewTask(Task task) {
+        super.addNewTask(task);
         save();
     }
 

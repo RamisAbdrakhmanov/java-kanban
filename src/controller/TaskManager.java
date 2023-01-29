@@ -13,11 +13,13 @@ public interface TaskManager {
 
     Task getTaskById(int o);
 
-    void createTask(Task task);
+    void addNewTask(Task task);
 
     void changeTask(Task task);
 
     void deleteTaskById(int id);
+
+    List<Task> getPrioritizedTasks();
 
     List<Subtask> subtasks(Epic epic);
 

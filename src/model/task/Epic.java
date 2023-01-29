@@ -3,20 +3,26 @@ package model.task;
 import model.Status;
 import model.TaskEnum;
 
+
+import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
+    LocalDateTime endTime;
 
-    public Epic(String name, String info) {
-        super(name, info);
+
+
+    public Epic(String name, String info, String startTime, String during) {
+        super(name, info, startTime, during);
         subtasks = new ArrayList<>();
         super.setTaskEnum(TaskEnum.EPIC);
     }
 
-    public Epic(String name, String info, Status status, int id) {
-        super(name, info, status, id);
+    public Epic(int id, String name, String info, Status status, String startTime, String duration) {
+        super(id, name, info, status, startTime, duration);
         subtasks = new ArrayList<>();
         super.setTaskEnum(TaskEnum.EPIC);
     }
@@ -25,7 +31,11 @@ public class Epic extends Task {
         return subtasks;
     }
 
-    public void addSubtaskInList(Subtask subtask){
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void addSubtaskInList(Subtask subtask) {
         subtasks.add(subtask);
     }
 

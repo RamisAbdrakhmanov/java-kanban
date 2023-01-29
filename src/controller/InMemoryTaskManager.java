@@ -1,16 +1,21 @@
 package controller;
 
+import exteptions.ManagerSaveExceptions;
 import model.Status;
 import model.task.*;
 import utils.Manager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     private final InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
     private Map<Integer, Task> taskHashMap = new HashMap<>(); //хранилище всех задач, где ключом является ID
-    private  AtomicInteger nextId = new AtomicInteger();
+    private AtomicInteger nextId = new AtomicInteger();
 
 
     @Override // показываю все задачи
@@ -35,35 +40,67 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override //создаю задачу
-    public void createTask(Task task) {
-        if (task.getId() == 0) {
-            int id = nextId.incrementAndGet();
-            task.setId(id);
-            taskHashMap.put(id, task);
-            try {
-                if (task instanceof Subtask) {
-                    int idEpic = ((Subtask) task).getIdEpic();
-                    Epic epic = (Epic) taskHashMap.get(idEpic);
-                    epic.addSubtaskInList((Subtask) task);
-                }
-            } catch (Exception e) {
-                System.out.println("Нульпоинтер = " + e);
+    public void addNewTask(Task task) {
+        try {
+            if (task == null) {
+                throw new ManagerSaveExceptions("Попытка создать Task = null");
             }
-        } else {
-            changeTask(task);
-        }
+            boolean check = checkIntersection(task);
+            if (check) {
+                throw new ManagerSaveExceptions("Задача пересекается");
+            }
 
+
+            if (task.getId() == 0) {
+                int id = nextId.incrementAndGet();
+                if (task.getId() != 0) { // если id занято, то ищем следующее пустое id.
+                    addNewTask(task);
+                }
+                task.setId(id);
+                taskHashMap.put(id, task);
+                try {
+                    if (task instanceof Subtask) {
+                        Subtask subtask = (Subtask) task;
+
+                        int idEpic = subtask.getIdEpic();
+
+                        Epic epic = (Epic) taskHashMap.get(idEpic);
+
+                        epic.addSubtaskInList(subtask);
+                        checkStartAndEndTimeEpic(subtask, epic);
+                    }
+                } catch (Exception e) {
+                    e.getMessage();
+                }
+            } else {
+                changeTask(task);
+            }
+        } catch (ManagerSaveExceptions e) {
+            e.printStackTrace();
+        }
     }
 
     @Override //перезаписываю задачу
     public void changeTask(Task task) {
-        if ((task.getId() != 0) || taskHashMap.containsKey(task.getId())) {
-            taskHashMap.put(task.getId(), task);
-            if (task instanceof Subtask) {
-                changeStatusTask((Epic) taskHashMap.get(((Subtask) task).getIdEpic()), (Subtask) task);
+        try {
+            if (task == null) {
+                throw new ManagerSaveExceptions("Попытка создать Task = null");
             }
-        } else {
-            System.out.println("Объект не имеет id или был когда-то удален.");
+            boolean check = checkIntersection(task);
+            if (check) {
+                throw new ManagerSaveExceptions("Задача пересекается");
+            }
+            if ((task.getId() != 0) || taskHashMap.containsKey(task.getId())) {
+                taskHashMap.put(task.getId(), task);
+                if (task instanceof Subtask) {
+                    changeStatusTask((Epic) taskHashMap.get(((Subtask) task).getIdEpic()), (Subtask) task);
+                }
+            } else {
+                System.out.println("Объект не имеет id или был когда-то удален.");
+            }
+
+        } catch (ManagerSaveExceptions e) {
+            e.printStackTrace();
         }
     }
 
@@ -71,20 +108,47 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int id) {
         if (taskHashMap.get(id) instanceof Epic) {
             for (Subtask subtask : ((Epic) taskHashMap.get(id)).getSubtasks()) {
-                if(historyManager.getMapHistory().containsKey(id)) {
+                if (historyManager.getMapHistory().containsKey(id)) {
                     historyManager.remove(subtask.getId());
                 }
                 taskHashMap.remove(subtask.getId());
             }
         }
-        if(historyManager.getMapHistory().containsKey(id)) {
+        if (historyManager.getMapHistory().containsKey(id)) {
             historyManager.remove(id);
         }
         taskHashMap.remove(id);
-
     }
 
-    @Override //просмотр у эпика отдельного спика сабтаска
+    //проверка пересечения
+    private boolean checkIntersection(Task task) {
+        List<Task> list = getPrioritizedTasks();
+        for (Task taskSort : list) {
+            if (task.getStartTime().isBefore(taskSort.getStartTime())) {
+                if (task.getEndTime().isAfter(taskSort.getStartTime())) {
+                    return true;
+                }
+            }
+
+            if (task.getStartTime().isBefore(taskSort.getEndTime())) {
+                if (task.getEndTime().isAfter(taskSort.getEndTime())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        List<Task> list = getAllTask().stream()
+                .sorted(Comparator.comparing(Task::getStartTime))
+                .collect(Collectors.toList());
+        return list;
+    }
+
+
+    @Override //просмотр у эпика отдельного списка сабтасков
     public List<Subtask> subtasks(Epic epic) {
         return epic.getSubtasks();
     }
@@ -105,10 +169,19 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    private void checkStartAndEndTimeEpic(Subtask subtask, Epic epic) {
+        LocalDateTime startTime = subtask.getStartTime();
+        LocalDateTime startTimeEpic = epic.getStartTime();
+
+        if (startTimeEpic.isAfter(startTime)) {
+            epic.setStartTime(startTime);
+        }
+        epic.setDuration(epic.getDuration() + subtask.getDuration());
+    }
+
     public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
     }
-
 
 
     public void setTaskHashMap(Map<Integer, Task> taskHashMap) {
@@ -120,6 +193,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void putTaskToTaskHashMap(int id, Task task) {
-        taskHashMap.put(id,task);
+        taskHashMap.put(id, task);
     }
 }
