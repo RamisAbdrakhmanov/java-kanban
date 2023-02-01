@@ -5,6 +5,8 @@ import model.task.Subtask;
 import model.task.Task;
 
 import java.util.List;
+import java.util.Set;
+
 
 public interface TaskManager {
     List<Task> getAllTask();
@@ -19,7 +21,7 @@ public interface TaskManager {
 
     void deleteTaskById(int id);
 
-    List<Task> getPrioritizedTasks();
+    Set<Task> getPrioritizedTasks();
 
     List<Subtask> subtasks(Epic epic);
 

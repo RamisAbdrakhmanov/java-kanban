@@ -2,36 +2,38 @@ package model.task;
 
 import controller.InMemoryTaskManager;
 import model.Status;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.Manager;
 
 import java.util.List;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
 
     private static InMemoryTaskManager taskManagers;
-    private Epic epic;
+    private static Epic epic;
     private boolean marker = true;
-    private Subtask subtask;
-    private Subtask subtask1;
-    private Subtask subtask2;
-    private List<Subtask> subtasks;
+    private static Subtask subtask;
+    private static Subtask subtask1;
+    private static Subtask subtask2;
+    private static List<Subtask> subtasks;
 
 
-    @BeforeEach
-    public void createOneEpicAndThreeSubtask() {
+    @BeforeAll
+    public static void createOneEpicAndThreeSubtask() {
         taskManagers = Manager.isDefault();
-        epic = new Epic("Epic", "Epic test","22.01.2099 17:00","0");
+        epic = new Epic("Epic", "Epic test","22.11.2019 17:00","0");
         taskManagers.addNewTask(epic);
 
-        subtask = new Subtask("Subtask", "test subtask","22.01.2019 17:00","1000", epic.getId());
+        subtask = new Subtask("Subtask", "test subtask","22.01.2029 17:00","1000", epic.getId());
         taskManagers.addNewTask(subtask);
-        subtask1 = new Subtask("Subtask1","test subtask", "22.01.2019 17:00","1000", epic.getId());
+        subtask1 = new Subtask("Subtask1","test subtask", "22.01.2039 17:00","1000", epic.getId());
         taskManagers.addNewTask(subtask1);
-        subtask2 = new Subtask("Subtask2","test subtask", "22.01.2019 17:00","1000", epic.getId());
+        subtask2 = new Subtask("Subtask2","test subtask", "22.01.2049 17:00","1000", epic.getId());
         taskManagers.addNewTask(subtask2);
 
 
@@ -95,7 +97,9 @@ class EpicTest {
 
         for (int i = 0; i < subtasks.size(); i++) {
 
-            assertEquals(Status.IN_PROGRESS, epic.getStatus(),"Subtask has status IN_PROGRESS, epic has status IN_PROGRESS. Result false." );
+            assertEquals(Status.IN_PROGRESS, epic.getStatus()
+                    ,"Subtask has status IN_PROGRESS," +
+                    " epic has status IN_PROGRESS. Result false." );
         }
     }
 

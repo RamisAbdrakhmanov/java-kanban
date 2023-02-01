@@ -11,10 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTasksManagerTest extends TaskManagerTest {
-    controller.FileBackedTasksManager manager = Manager.isDefaultFile();
+
 
     @Test
     void saveAndReadTest() {
+        FileBackedTasksManager manager = Manager.isDefaultFile();
         Task task2 = new Task("уборка", "Субботник", "22.01.2019 17:02", "10000");
         manager.addNewTask(task2);
 
@@ -23,7 +24,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest {
 
         Subtask subtask12 = new Subtask("Звезда смерти"
                 , "Построить звезду смерти"
-                , "22.01.2018 17:00", "10000", starWars.getId());
+                , "22.01.2018 17:00", "1000", starWars.getId());
         manager.addNewTask(subtask12);
 
         manager.getTaskById(3);
@@ -36,8 +37,22 @@ class FileBackedTasksManagerTest extends TaskManagerTest {
         List<Task> tasksRead = manager.getAllTask();
 
         assertEquals(tasksRead, tasksSave, "Запись и чтение не совпадают");
-
-
     }
+
+    @Test
+    void saveNullTest(){
+        FileBackedTasksManager taskManager = new FileBackedTasksManager();
+       taskManager.save();
+    }
+
+    @Test
+    void readNullTest(){
+        FileBackedTasksManager taskManager = new FileBackedTasksManager();
+
+       NullPointerException exception = assertThrows(NullPointerException.class, () -> taskManager.read());
+
+       assertEquals(new NullPointerException().getMessage(),exception.getMessage());
+    }
+
 
 }

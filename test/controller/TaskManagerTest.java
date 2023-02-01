@@ -6,66 +6,72 @@ import model.task.Subtask;
 import model.task.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import utils.Manager;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskManagerTest {
+/*abstract */class TaskManagerTest /* <T extends TaskManager> */{
+    //1.для проверки статуса Epic создал отдельный класс и там все что с ним связано проверил.
 
-    private TaskManager taskManager;
-    private Task task1;
-    private Task task2;
-    private Epic epic1;
-    private Subtask subtask1;
-    private Subtask subtask2;
-    private Subtask subtask3;
+    //2. Не могу понять как сделать систему на основе дженериков правильно.
+    //
+    // Все, что в /* */ если раскомментировать и закомментировать 26 строку, удалить 37, получится как просят в тз,
+    // но я не могу понять почему у меня не работает, что я делаю не так там. В классе InMemoryTaskManager тоже все ок.
+
+
+
+   /* protected T taskManager;*/
+    protected TaskManager taskManager;
+    protected Task task1;
+    protected Task task2;
+    protected Epic epic1;
+    protected Subtask subtask1;
+    protected Subtask subtask2;
+    protected Subtask subtask3;
 
 
     @BeforeEach
-    void beforeEach() {
-        taskManager = Manager.isDefault();
+    public void beforeEach() {
+        taskManager = new InMemoryTaskManager();
         task1 = new Task("Test1 addNewTask",
-                "Test1", "22.01.2019 17:00",
+                "Test1", "22.11.1919 17:00",
                 "1000");
         taskManager.addNewTask(task1);
         task2 = new Task("Test2 addNewTask",
                 "Test2",
-                "22.02.2019 17:00",
+                "22.12.1909 17:00",
                 "1000");
         taskManager.addNewTask(task2);
 
         epic1 = new Epic("Epic1 addNewTask",
                 "Epic1 addNewTask description",
-                "22.02.2099 17:00",
+                "22.02.1899 17:00",
                 "1000");
         taskManager.addNewTask(epic1);
 
         subtask1 = new Subtask("Subtask1 addNewTask",
                 "Subtask1",
-                "22.03.2019 17:00",
+                "22.03.1011 17:00",
                 "1000", epic1.getId());
         taskManager.addNewTask(subtask1);
         subtask2 = new Subtask("Subtask2 addNewTask",
                 "Subtask2",
-                "22.03.2019 17:00",
+                "21.03.3312 17:00",
                 "1000", epic1.getId());
         taskManager.addNewTask(subtask2);
         subtask3 = new Subtask("Subtask2 addNewTask",
-                "Subtask3", "22.03.2019 17:00",
+                "Subtask3", "23.03.1419 17:00",
                 "1000", epic1.getId());
         taskManager.addNewTask(subtask3);
     }
 
 
     @Test
-    void AddNewTaskTest() {
+    void addNewTaskTest() {
         Task task = new Task("Test123 addNewTask",
-                "Test123", "22.01.2019 17:00",
+                "Test123", "22.01.2113 17:00",
                 "1000");
         taskManager.addNewTask(task);
         int taskId = task.getId();
@@ -80,19 +86,28 @@ class TaskManagerTest {
         assertNotNull(tasks, "Задачи нe возвращаются.");
         assertEquals(7, tasks.size(), "Неверное количество задач.");
         assertEquals(task, tasks.get(6), "Задачи не совпадают.");
+    }
+    @Test
+    void addNewTaskSameTimeTest() {
+        Task task = new Task("Test123 addNewTask",
+                "Test123", "22.12.1909 17:00",
+                "1000");
 
+        taskManager.addNewTask(task);
+        assertFalse(taskManager.getAllTask().contains(task),"Некорректное добавление пересекающихся задач");
     }
 
     @Test
-    void AddNewTaskNullTest() {
+    void addNewTaskNullTest() {
+
         assertDoesNotThrow(() -> taskManager.addNewTask(null), "Некорректная обработка null");
     }
 
     @Test
-    void ChangeTaskTest() {
+    void changeTaskTest() {
         Task task = new Task("Test123 addNewTask",
-                "Test123", "22.01.2019 17:00",
-                "1000");
+                "Test123", "22.11.1514 17:00",
+                "100");
         taskManager.addNewTask(task);
         task.setStatus(Status.DONE);
         taskManager.changeTask(task);
@@ -101,15 +116,25 @@ class TaskManagerTest {
     }
 
     @Test
-    void ChangeTaskNullTest() {
+    void changeTaskSameTimeTest() {
+        Task task = new Task("Test123 addNewTask",
+                "Test123", "22.12.1909 17:00",
+                "1000");
+
+        taskManager.changeTask(task);
+        assertFalse(taskManager.getAllTask().contains(task),"Некорректное добавление пересекающихся задач");
+    }
+
+    @Test
+    void changeTaskNullTest() {
         assertDoesNotThrow(() -> taskManager.changeTask(null), "Некорректная обработка null");
     }
 
     @Test
-    void ChangeTaskWrongTest() {
+    void changeTaskWrongTest() {
         Task task = new Task(14, "Test addNewTask",
                 "Test", Status.DONE,
-                "22.01.2019 17:00", "1000");
+                "22.01.2222 17:00", "1000");
         taskManager.changeTask(task);
 
         assertEquals(task, taskManager.getTaskById(task.getId()), "Некорректная обработка незаписанного id");
@@ -152,14 +177,17 @@ class TaskManagerTest {
 
     @Test
     void getPrioritizedTasks() {
-        List<Task> tasks = List.of(task1, task2, epic1, subtask1, subtask2, subtask3);
+        Set<Task> tasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+        tasks.add(task1);
+        tasks.add(task2);
+        tasks.add(subtask1);
+        tasks.add(epic1);
+        tasks.add(subtask2);
+        tasks.add(subtask3);
 
-        List<Task> tasksGetPrior = taskManager.getPrioritizedTasks();
-
-        tasks.stream().sorted(Comparator.comparing(Task::getStartTime)).collect(Collectors.toList());
+        Set<Task> tasksGetPrior = taskManager.getPrioritizedTasks();
 
         assertEquals(tasks, tasksGetPrior, "Списки отсортированы неверно");
     }
-
 
 }
