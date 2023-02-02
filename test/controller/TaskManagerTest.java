@@ -12,7 +12,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*abstract */class TaskManagerTest /* <T extends TaskManager> */{
+/*abstract */class TaskManagerTest /* <T extends TaskManager> */ {
     //1.для проверки статуса Epic создал отдельный класс и там все что с ним связано проверил.
 
     //2. Не могу понять как сделать систему на основе дженериков правильно.
@@ -21,8 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
     // но я не могу понять почему у меня не работает, что я делаю не так там. В классе InMemoryTaskManager тоже все ок.
 
 
-
-   /* protected T taskManager;*/
+    /* protected T taskManager;*/
     protected TaskManager taskManager;
     protected Task task1;
     protected Task task2;
@@ -87,6 +86,7 @@ import static org.junit.jupiter.api.Assertions.*;
         assertEquals(7, tasks.size(), "Неверное количество задач.");
         assertEquals(task, tasks.get(6), "Задачи не совпадают.");
     }
+
     @Test
     void addNewTaskSameTimeTest() {
         Task task = new Task("Test123 addNewTask",
@@ -94,12 +94,11 @@ import static org.junit.jupiter.api.Assertions.*;
                 "1000");
 
         taskManager.addNewTask(task);
-        assertFalse(taskManager.getAllTask().contains(task),"Некорректное добавление пересекающихся задач");
+        assertFalse(taskManager.getAllTask().contains(task), "Некорректное добавление пересекающихся задач");
     }
 
     @Test
     void addNewTaskNullTest() {
-
         assertDoesNotThrow(() -> taskManager.addNewTask(null), "Некорректная обработка null");
     }
 
@@ -122,7 +121,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 "1000");
 
         taskManager.changeTask(task);
-        assertFalse(taskManager.getAllTask().contains(task),"Некорректное добавление пересекающихся задач");
+        assertFalse(taskManager.getAllTask().contains(task), "Некорректное добавление пересекающихся задач");
     }
 
     @Test

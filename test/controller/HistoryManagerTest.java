@@ -4,9 +4,7 @@ import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import utils.Manager;
 
 import java.util.ArrayList;
@@ -87,7 +85,7 @@ class HistoryManagerTest {
 
         assertEquals("no message resource found for message id: " +
                         "Error remove by id in History: java.lang.NullPointerException"
-                ,runtimeException.getMessage(),"Удаления из пустого списка неверно");
+                , runtimeException.getMessage(), "Удаления из пустого списка неверно");
 
     }
 
@@ -96,15 +94,16 @@ class HistoryManagerTest {
         Integer[] testId = {4, 2, 3, 5, 1, 6};
         List<Integer> idList = new ArrayList<>(List.of(testId));
         List<Integer> list = historyManager.getHistory().stream().map(Task::getId).collect(Collectors.toList());
-        assertEquals(idList, list,"История просмотров не совпадает");
+        assertEquals(idList, list, "История просмотров не совпадает");
     }
+
     @Test
     void getHistoryNullTest() {
         HistoryManager historyManagerNull = new InMemoryHistoryManager();
         Integer[] testId = {};
         List<Integer> idList = new ArrayList<>(List.of(testId));
         List<Integer> list = historyManagerNull.getHistory().stream().map(Task::getId).collect(Collectors.toList());
-        assertEquals(idList, list,"Пустая история просмотров не совпадает");
+        assertEquals(idList, list, "Пустая история просмотров не совпадает");
     }
 
 

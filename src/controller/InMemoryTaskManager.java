@@ -78,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
                 changeTask(task);
             }
         } catch (ManagerSaveExceptions e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -102,19 +102,19 @@ public class InMemoryTaskManager implements TaskManager {
                     Subtask subActual = (Subtask) task;
                     Epic epic = (Epic) taskHashMap.get(subActual.getIdEpic());
 
-                     Subtask subMarker = null;
+                    Subtask subMarker = null;
                     for (Subtask subtask : epic.getSubtasks()) { //честно не знаю как более адекватно поменять список
-                        if(subtask.getId() == task.getId()){    // сабтасков у эпика.
+                        if (subtask.getId() == task.getId()) {    // сабтасков у эпика.
                             subMarker = subtask;
                         }
                     }
-                    if(subMarker  != null){
+                    if (subMarker != null) {
                         epic.getSubtasks().remove(subMarker);
                         epic.getSubtasks().add(subActual);
                     } //очень не нравится кусок с 105 строчки и до сюда, но пока не могу придумать как поменять
 
 
-                    changeStatusAndTimeEpic((Subtask) task,epic);
+                    changeStatusAndTimeEpic((Subtask) task, epic);
                 }
 
             } else {
@@ -122,7 +122,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
 
         } catch (ManagerSaveExceptions e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -182,7 +182,7 @@ public class InMemoryTaskManager implements TaskManager {
             );
 
             if (targetZone1 || targetZone2 || targetZone3) {
-                if(task.getId() != taskSort.getId()){
+                if (task.getId() != taskSort.getId()) {
                     return true;
                 }
             }
@@ -207,8 +207,8 @@ public class InMemoryTaskManager implements TaskManager {
     //отслеживаю изменения большой задачи, при изменении подзадачи
     private void changeStatusAndTimeEpic(Subtask subtask, Epic epic) {
 
-        for(Subtask sub : epic.getSubtasks()){
-            if(sub.getStartTime().isBefore(epic.getStartTime())){
+        for (Subtask sub : epic.getSubtasks()) {
+            if (sub.getStartTime().isBefore(epic.getStartTime())) {
                 epic.setStartTime(sub.getStartTime());
             }
         }
@@ -226,18 +226,18 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.setStatus(Status.IN_PROGRESS);
                 break;
             case NEW:
-                for (Subtask sub : epic.getSubtasks()){
+                for (Subtask sub : epic.getSubtasks()) {
                     epic.setStatus(Status.NEW);
-                    if(sub.getStatus() != Status.NEW){
+                    if (sub.getStatus() != Status.NEW) {
                         epic.setStatus(Status.IN_PROGRESS);
                         break;
                     }
                 }
                 break;
             case DONE:
-                for (Subtask sub : epic.getSubtasks()){
+                for (Subtask sub : epic.getSubtasks()) {
 
-                    if(sub.getStatus() != Status.DONE){
+                    if (sub.getStatus() != Status.DONE) {
                         epic.setStatus(Status.IN_PROGRESS);
                         break;
                     }

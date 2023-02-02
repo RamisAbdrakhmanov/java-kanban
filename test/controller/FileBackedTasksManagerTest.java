@@ -10,16 +10,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTasksManagerTest extends TaskManagerTest {
+class FileBackedTasksManagerTest {
 
 
     @Test
     void saveAndReadTest() {
         FileBackedTasksManager manager = Manager.isDefaultFile();
-        Task task2 = new Task("уборка", "Субботник", "22.01.2019 17:02", "10000");
+        Task task2 = new Task("уборка", "Субботник", "22.01.2017 17:02", "1000");
         manager.addNewTask(task2);
 
-        Epic starWars = new Epic("Хогвартс", "заданья на год", "22.01.2019 17:00", "0");
+        Epic starWars = new Epic("Хогвартс", "заданья на год", "22.01.2014 17:00", "0");
         manager.addNewTask(starWars);
 
         Subtask subtask12 = new Subtask("Звезда смерти"
@@ -40,18 +40,18 @@ class FileBackedTasksManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void saveNullTest(){
+    void saveNullTest() {
         FileBackedTasksManager taskManager = new FileBackedTasksManager();
-       taskManager.save();
+        taskManager.save();
     }
 
     @Test
-    void readNullTest(){
+    void readNullTest() {
         FileBackedTasksManager taskManager = new FileBackedTasksManager();
 
-       NullPointerException exception = assertThrows(NullPointerException.class, () -> taskManager.read());
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> taskManager.read());
 
-       assertEquals(new NullPointerException().getMessage(),exception.getMessage());
+        assertEquals(new NullPointerException().getMessage(), exception.getMessage());
     }
 
 

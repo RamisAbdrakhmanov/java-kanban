@@ -26,16 +26,15 @@ class EpicTest {
     @BeforeAll
     public static void createOneEpicAndThreeSubtask() {
         taskManagers = Manager.isDefault();
-        epic = new Epic("Epic", "Epic test","22.11.2019 17:00","0");
+        epic = new Epic("Epic", "Epic test", "22.11.2019 17:00", "0");
         taskManagers.addNewTask(epic);
 
-        subtask = new Subtask("Subtask", "test subtask","22.01.2029 17:00","1000", epic.getId());
+        subtask = new Subtask("Subtask", "test subtask", "22.01.2029 17:00", "1000", epic.getId());
         taskManagers.addNewTask(subtask);
-        subtask1 = new Subtask("Subtask1","test subtask", "22.01.2039 17:00","1000", epic.getId());
+        subtask1 = new Subtask("Subtask1", "test subtask", "22.01.2039 17:00", "1000", epic.getId());
         taskManagers.addNewTask(subtask1);
-        subtask2 = new Subtask("Subtask2","test subtask", "22.01.2049 17:00","1000", epic.getId());
+        subtask2 = new Subtask("Subtask2", "test subtask", "22.01.2049 17:00", "1000", epic.getId());
         taskManagers.addNewTask(subtask2);
-
 
 
         subtasks = epic.getSubtasks();
@@ -51,7 +50,7 @@ class EpicTest {
                 marker = false;
             }
         }
-        assertTrue(marker,"All subtasks have status NEW, epic has status NEW. Result false." );
+        assertTrue(marker, "All subtasks have status NEW, epic has status NEW. Result false.");
     }
 
     @Test
@@ -72,7 +71,7 @@ class EpicTest {
                 marker = false;
             }
         }
-        assertTrue(marker,"All subtasks have status DONE, epic has status DONE. Result false." );
+        assertTrue(marker, "All subtasks have status DONE, epic has status DONE. Result false.");
     }
 
     @Test
@@ -85,7 +84,7 @@ class EpicTest {
 
             assertEquals(Status.IN_PROGRESS,
                     epic.getStatus(),
-                    "Subtasks have status DONE and NEW, epic has status IN_PROGRESS. Result false." );
+                    "Subtasks have status DONE and NEW, epic has status IN_PROGRESS. Result false.");
         }
     }
 
@@ -98,8 +97,8 @@ class EpicTest {
         for (int i = 0; i < subtasks.size(); i++) {
 
             assertEquals(Status.IN_PROGRESS, epic.getStatus()
-                    ,"Subtask has status IN_PROGRESS," +
-                    " epic has status IN_PROGRESS. Result false." );
+                    , "Subtask has status IN_PROGRESS," +
+                            " epic has status IN_PROGRESS. Result false.");
         }
     }
 
