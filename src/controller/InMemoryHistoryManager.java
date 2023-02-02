@@ -1,5 +1,6 @@
 package controller;
 
+import exteptions.ManagerSaveExceptions;
 import model.task.Task;
 
 import java.util.ArrayList;
@@ -52,6 +53,15 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override //записать в список истории поиска задач
     public void addTaskInHistory(Task task) {
+        try {
+
+            if (task == null) {
+                System.out.println(task);
+                throw new ManagerSaveExceptions("Попытка записать null в историю");
+            }
+        } catch (ManagerSaveExceptions e) {
+            System.out.println(e.getMessage());
+        }
         if (history.containsKey(task.getId())) {
             remove(task.getId());
         }

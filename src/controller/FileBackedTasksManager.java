@@ -84,6 +84,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return historyList;
     }
 
+    // очистка истории
+    public void clearHistory() {
+        for (Task task : getAllTask()) {
+            historyManager.remove(task.getId());
+        }
+    }
+
     public void addTaskInHistory(int id) {
         Task task = this.getTaskById(id);
         historyManager.addTaskInHistory(task);
