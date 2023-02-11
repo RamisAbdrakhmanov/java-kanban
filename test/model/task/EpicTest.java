@@ -26,14 +26,14 @@ class EpicTest {
     public static void createOneEpicAndThreeSubtask() {
         taskManagers = Manager.isDefault();
         epic = new Epic("Epic", "Epic test", "22.11.2019 17:00", "0");
-        taskManagers.addNewTask(epic);
+        taskManagers.addTask(epic);
 
         subtask = new Subtask("Subtask", "test subtask", "22.01.2029 17:00", "1000", epic.getId());
-        taskManagers.addNewTask(subtask);
+        taskManagers.addTask(subtask);
         subtask1 = new Subtask("Subtask1", "test subtask", "22.01.2039 17:00", "1000", epic.getId());
-        taskManagers.addNewTask(subtask1);
+        taskManagers.addTask(subtask1);
         subtask2 = new Subtask("Subtask2", "test subtask", "22.01.2049 17:00", "1000", epic.getId());
-        taskManagers.addNewTask(subtask2);
+        taskManagers.addTask(subtask2);
 
 
         subtasks = epic.getSubtasks();
@@ -58,9 +58,9 @@ class EpicTest {
         subtask1.setStatus(Status.DONE);
         subtask2.setStatus(Status.DONE);
 
-        taskManagers.changeTask(subtask);
-        taskManagers.changeTask(subtask1);
-        taskManagers.changeTask(subtask2);
+        taskManagers.updateTask(subtask);
+        taskManagers.updateTask(subtask1);
+        taskManagers.updateTask(subtask2);
 
         for (Subtask value : subtasks) {
             if (epic.getStatus() != Status.DONE) {
@@ -77,7 +77,7 @@ class EpicTest {
     public void subtaskStatusDoneAndNew() {
         subtask.setStatus(Status.DONE);
 
-        taskManagers.changeTask(subtask);
+        taskManagers.updateTask(subtask);
 
         for (int i = 0; i < subtasks.size(); i++) {
 
@@ -91,7 +91,7 @@ class EpicTest {
     public void subtaskStatusIn_progressOrNew() {
         subtask.setStatus(Status.IN_PROGRESS);
 
-        taskManagers.changeTask(subtask);
+        taskManagers.updateTask(subtask);
 
         for (int i = 0; i < subtasks.size(); i++) {
 

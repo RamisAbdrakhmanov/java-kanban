@@ -84,13 +84,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return historyList;
     }
 
-    // очистка истории
-    public void clearHistory() {
-        for (Task task : getAllTask()) {
-            historyManager.remove(task.getId());
-        }
-    }
-
     public void addTaskInHistory(int id) {
         Task task = this.getTaskById(id);
         historyManager.addTaskInHistory(task);
@@ -181,34 +174,46 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     @Override
-    public List<Task> getAllTask() {
-        return super.getAllTask();
+    public List<Task> getTasks() {
+        return super.getTasks();
     }
 
-    @Override
-    public void deleteAllTask() {
-        super.deleteAllTask();
-        save();
-    }
+
 
     @Override
     public Task getTaskById(int o) {
         Task task = super.getTaskById(o);
         save();
         return task;
-
     }
 
     @Override
-    public void addNewTask(Task task) {
-        super.addNewTask(task);
+    public void addTask(Task task) {
+        super.addTask(task);
         save();
     }
 
     @Override
-    public void changeTask(Task task) {
-        super.changeTask(task);
+    public void updateTask(Task task) {
+        super.updateTask(task);
         save();
+    }
+    @Override
+    public void deleteAllTasks() {
+        super.deleteAllTasks();
+        clearHistory();
+        save();
+    }
+
+    // очистка истории
+    public void clearHistory() {
+        for (Task task : getTasks()) {
+            historyManager.remove(task.getId());
+        }
+    }
+    public List<Integer> getHistory(){
+        List<Integer> history = historyManager.getHistory().stream().map(Task::getId).collect(Collectors.toList());
+        return history;
     }
 
     @Override

@@ -9,15 +9,15 @@ import java.util.Set;
 
 
 public interface TaskManager {
-    List<Task> getAllTask();
+    List<Task> getTasks();
 
-    void deleteAllTask();
+    void deleteAllTasks();
 
     Task getTaskById(int o);
 
-    void addNewTask(Task task);
+    void addTask(Task task);
 
-    void changeTask(Task task);
+    void updateTask(Task task);
 
     void deleteTaskById(int id);
 

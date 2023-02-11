@@ -27,33 +27,33 @@ class HistoryManagerTest {
                 "Test1 addNewTask description",
                 "22.01.2019 17:20",
                 "1000");
-        taskManager.addNewTask(task1);
+        taskManager.addTask(task1);
         Task task2 = new Task("Test2 addNewTask",
                 "Test2 addNewTask description",
                 "22.01.2021 17:20",
                 "1000");
-        taskManager.addNewTask(task2);
+        taskManager.addTask(task2);
         Epic epic1 = new Epic("Epic1 addNewTask",
                 "Epic1 addNewTask description", "22.01.2022 17:00", "1000");
-        taskManager.addNewTask(epic1);
+        taskManager.addTask(epic1);
         Subtask subtask1 = new Subtask("Subtask1 addNewTask",
                 "Subtask1 addNewTask description",
                 "22.01.2023 17:20",
                 "1000",
                 epic1.getId());
-        taskManager.addNewTask(subtask1);
+        taskManager.addTask(subtask1);
         Subtask subtask2 = new Subtask("Subtask2 addNewTask",
                 "Subtask2 addNewTask description",
                 "22.01.2024 17:20",
                 "1000",
                 epic1.getId());
-        taskManager.addNewTask(subtask2);
+        taskManager.addTask(subtask2);
         Subtask subtask3 = new Subtask("Subtask2 addNewTask",
                 "Subtask3 addNewTask description",
                 "22.01.2025 17:20",
                 "1000",
                 epic1.getId());
-        taskManager.addNewTask(subtask3);
+        taskManager.addTask(subtask3);
 
         taskManager.getTaskById(1);
         taskManager.getTaskById(2);

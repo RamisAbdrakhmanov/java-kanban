@@ -1,46 +1,54 @@
 package test;
 
+import controller.TZ8.HttpTaskManager;
+import controller.TZ8.HttpTaskServer;
 import controller.InMemoryHistoryManager;
+import controller.TZ8.KVServer;
 import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
 import utils.Manager;
 
-public class FileBackedTasksManager {
-    public static void main(String[] args) {
-        InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
-        controller.FileBackedTasksManager manager1 = Manager.isDefaultFile();
+import java.io.IOException;
 
-        boolean checkSaveOrRead = false; //переключатель для удобства проверки True записывает False считывает
+public class FileBackedTasksManager {
+    static String name ="/tasks";
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new KVServer().start();
+        InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
+        HttpTaskManager  manager1 = new HttpTaskManager("http://localhost:8078");
+
+        boolean checkSaveOrRead = true; //переключатель для удобства проверки True записывает False считывает
 
         if (checkSaveOrRead) {
 
             Task task = new Task("Путеществие", "Добраться", "22.01.2019 17:00", "33333");
-            manager1.addNewTask(task);
+            manager1.addTask(task);
 
             Task task1 = new Task("Английский", "британ", "22.01.2012 17:01", "33333");
-            manager1.addNewTask(task1);
+            manager1.addTask(task1);
 
             Task task2 = new Task("уборка", "Субботник", "22.01.2013 17:02", "10000");
-            manager1.addNewTask(task2);
+            manager1.addTask(task2);
 
             Epic starWars = new Epic("Хогвартс", "заданья на год", "22.01.2014 17:00", "0");
-            manager1.addNewTask(starWars);
+            manager1.addTask(starWars);
 
             Subtask subtask12 = new Subtask("Звезда смерти"
                     , "Построить звезду смерти"
                     , "22.01.2018 17:00", "10000", starWars.getId());
-            manager1.addNewTask(subtask12);
+            manager1.addTask(subtask12);
 
             Subtask subtask13 = new Subtask("Звезда смерти 2"
                     , "что все держится на одном объекте"
                     , "22.01.2015 17:00", "10000", starWars.getId());
-            manager1.addNewTask(subtask13);
+            manager1.addTask(subtask13);
 
             Subtask subtask14 = new Subtask("Звезда смерти 3"
                     , "З финал через кучу лет"
                     , "22.01.2022 17:00", "10000", starWars.getId());
-            manager1.addNewTask(subtask14);
+            manager1.addTask(subtask14);
 
 
             System.out.println(manager1.getTaskById(5));
@@ -60,6 +68,7 @@ public class FileBackedTasksManager {
             System.out.println(manager1.getTaskHashMap());
             System.out.println(historyManager.getMapHistory());
         }
+        HttpTaskServer taskServer = new HttpTaskServer(name);
 
 
     }

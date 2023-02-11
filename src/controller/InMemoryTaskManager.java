@@ -18,12 +18,12 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override // показываю все задачи
-    public List<Task> getAllTask() {
+    public List<Task> getTasks() {
         return new ArrayList<>(taskHashMap.values());
     }
 
     @Override //очищаю мапу задач
-    public void deleteAllTask() {
+    public void deleteAllTasks() {
         taskHashMap.clear();
     }
 
@@ -39,7 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override //создаю задачу
-    public void addNewTask(Task task) {
+    public void addTask(Task task) {
         try {
             if (task == null) {
                 throw new ManagerSaveExceptions("Попытка создать Task = null");
@@ -55,7 +55,7 @@ public class InMemoryTaskManager implements TaskManager {
 
                 // если id занято, то ищем следующее пустое id.
                 if (task.getId() != 0) {
-                    addNewTask(task);
+                    addTask(task);
                 }
                 task.setId(id);
                 taskHashMap.put(id, task);
@@ -75,7 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
                     e.getMessage();
                 }
             } else {
-                changeTask(task);
+                updateTask(task);
             }
         } catch (ManagerSaveExceptions e) {
             System.out.println(e.getMessage());
@@ -83,12 +83,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override //перезаписываю задачу
-    public void changeTask(Task task) {
+    public void updateTask(Task task) {
         try {
             if (task == null) {
                 throw new ManagerSaveExceptions("Попытка перезаписать Task = null");
             }
-
             boolean check = checkIntersection(task);
 
             if (check) {
@@ -103,15 +102,15 @@ public class InMemoryTaskManager implements TaskManager {
                     Epic epic = (Epic) taskHashMap.get(subActual.getIdEpic());
 
                     Subtask subMarker = null;
-                    for (Subtask subtask : epic.getSubtasks()) { //честно не знаю как более адекватно поменять список
-                        if (subtask.getId() == task.getId()) {    // сабтасков у эпика.
+                    for (Subtask subtask : epic.getSubtasks()) {
+                        if (subtask.getId() == task.getId()) {
                             subMarker = subtask;
                         }
                     }
                     if (subMarker != null) {
                         epic.getSubtasks().remove(subMarker);
                         epic.getSubtasks().add(subActual);
-                    } //очень не нравится кусок с 105 строчки и до сюда, но пока не могу придумать как поменять
+                    }
 
 
                     changeStatusAndTimeEpic((Subtask) task, epic);

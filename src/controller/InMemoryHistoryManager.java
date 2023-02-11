@@ -89,7 +89,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         ArrayList<Task> tasks = new ArrayList<>();
         Node l = last;
         while (l != null) {
-            if (l.prev != null) {   // убрал рекурсию
+            if (l.prev != null) {
                 tasks.add(l.item);
                 l = l.prev;
             } else {

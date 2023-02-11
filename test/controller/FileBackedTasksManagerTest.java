@@ -3,6 +3,7 @@ package controller;
 import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.Manager;
@@ -18,26 +19,32 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager = new FileBackedTasksManager();
     }
 
+    @AfterEach
+    public void afterEach(){
+        HistoryManager historyManager = Manager.getDefaultHistory();
+        if(!(historyManager.getHistory().isEmpty())) {
+            taskManager.clearHistory();
+        }
+    }
+
 
     @Test
     public void saveAndReadTest() {
         Task task123 = new Task("Task", "Task info", "22.01.2017 17:02", "1000");
         Epic starWars = new Epic("Хогвартс", "заданья на год", "22.01.2014 17:00", "0");
-        taskManager.clearHistory();
-        Manager.getDefaultHistory().remove(14);
-        taskManager.addNewTask(task123);
-        taskManager.addNewTask(starWars);
+        taskManager.addTask(task123);
+        taskManager.addTask(starWars);
         Subtask subtask12 = new Subtask("Звезда смерти"
                 , "Построить звезду смерти"
                 , "22.01.2018 17:00", "1000", starWars.getId());
-        taskManager.addNewTask(subtask12);
+        taskManager.addTask(subtask12);
         taskManager.getTaskById(3);
         taskManager.getTaskById(2);
         taskManager.getTaskById(1);
-        List<Task> tasksSave = taskManager.getAllTask();
+        List<Task> tasksSave = taskManager.getTasks();
         taskManager.clearHistory();
         taskManager.read();
-        List<Task> tasksRead = taskManager.getAllTask();
+        List<Task> tasksRead = taskManager.getTasks();
         assertEquals(tasksRead, tasksSave, "Запись и чтение не совпадают");
     }
 
