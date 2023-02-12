@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
+    protected final InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
     private Map<Integer, Task> taskHashMap = new HashMap<>();//хранилище всех задач, где ключом является ID
     private AtomicInteger nextId = new AtomicInteger();
     private Set<Task> priorTask = new TreeSet<>(Comparator.comparing(Task::getStartTime));
@@ -30,7 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override //показываю задачу по ID
     public Task getTaskById(int o) {
         if (taskHashMap.containsKey(o)) {
-            historyManager.addTaskInHistory(taskHashMap.get(o));
+            this.historyManager.addTaskInHistory(taskHashMap.get(o));
             return taskHashMap.get(o);
         } else {
             System.out.println("Возможно данного ID нет в базе");

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Optional;
 
 
@@ -13,27 +12,28 @@ import adapter.LocalDateTimeAdapter;
 import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import controller.FileBackedTasksManager;
+import controller.TaskManager;
 import exteptions.ManagerSaveExceptions;
+import model.Status;
+import model.TaskEnum;
+import model.task.Epic;
+import model.task.Subtask;
 import model.task.Task;
-import utils.Manager;
 
 
 public class TaskHandler implements HttpHandler {
-    //Извиняюсь, что я отправил полусырой проект, но мне очень многое непонятно, поэтому хотел спросить
-    // 1:мне делать ендпоинтеры отдельные для каждого типа тасков?
-    // 2:Как я могу написать тесты для локалхоста, мне свой клиент и для тестов писать?
-    // 3:Мне вообще может переписать всю логику тогда с разделением эпиков сабтасков и тасков, потому-что я не понимаю,
-    // как сохранять их на сервер.
+
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTimeAdapter.class, new LocalDateTimeAdapter()).create();
-    private FileBackedTasksManager manager = Manager.isDefaultFile();
+    private final HttpTaskManager manager;
 
-
+    public TaskHandler(TaskManager taskManager) {
+        manager = (HttpTaskManager) taskManager;
+    }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange){
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
 
         switch (endpoint) {
@@ -101,7 +101,7 @@ public class TaskHandler implements HttpHandler {
         if (pathParts.length == 3
                 && pathParts[1].equals("tasks")
                 && pathParts[2].equals("history")) {
-          return Endpoint.GET_TASKS_HISTORY;
+            return Endpoint.GET_TASKS_HISTORY;
         }
 
 
@@ -134,11 +134,10 @@ public class TaskHandler implements HttpHandler {
     }
 
 
-
     public void deleteTaskById(HttpExchange exchange) {
         Optional<Integer> taskIdOpt = getTaskId(exchange);
-        if(taskIdOpt.isEmpty()){
-            writeResponse(exchange,"Некорректный идентификатор задачи",400);
+        if (taskIdOpt.isEmpty()) {
+            writeResponse(exchange, "Некорректный идентификатор задачи", 400);
         }
         int taskId = taskIdOpt.get();
         Task task = manager.getTaskById(taskId);
@@ -155,17 +154,15 @@ public class TaskHandler implements HttpHandler {
         writeResponse(exchange, "Список задач очищен", 200);
     }
 
-    public void addOrUpdateTask(HttpExchange exchange){
+    public void addOrUpdateTask(HttpExchange exchange) {
         try {
             InputStream inputStream = exchange.getRequestBody();
-            String body = new String(inputStream.readAllBytes(),DEFAULT_CHARSET);
-
-            Task task = gson.fromJson(body,Task.class);
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            Task task = fromString(body);
             manager.updateTask(task);
-            writeResponse(exchange,"Задача добавлена",201);
-        }catch (JsonSyntaxException e){
-            writeResponse(exchange,"Получен некорректный JSON",400);
-            return;
+            writeResponse(exchange, "Задача добавлена", 201);
+        } catch (JsonSyntaxException e) {
+            writeResponse(exchange, "Получен некорректный JSON", 400);
         } catch (IOException e) {
             e.printStackTrace();
             throw new ManagerSaveExceptions("Ошибка при считывание body: ");
@@ -174,10 +171,8 @@ public class TaskHandler implements HttpHandler {
     }
 
     public void getHistory(HttpExchange exchange) {
-        writeResponse(exchange, gson.toJson(manager.getHistory()),200);
+        writeResponse(exchange, gson.toJson(manager.getHistory()), 200);
     }
-
-
 
 
     private Optional<Integer> getTaskId(HttpExchange exchange) {
@@ -208,7 +203,36 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
+    public Task fromString(String value) {
+        String[] splitLine = value.split(",");
 
-    enum Endpoint {GET_TASKS, GET_TASKS_BY_ID, GET_PRIOR_TASKS, DELETE_TASKS, DELETE_TASK_BY_ID, POST_TASK
-        ,GET_TASKS_HISTORY, UNKNOWN}
+        int id = Integer.parseInt(splitLine[0]);
+        TaskEnum taskType = TaskEnum.valueOf(splitLine[1]);
+        String name = splitLine[2];
+        Status status = Status.valueOf(splitLine[3]);
+        String info = splitLine[4];
+        String idEpicStr = splitLine[5];
+        String startTime = splitLine[6];
+        String duration = splitLine[7];
+
+        switch (taskType) {
+            case TASK:
+                Task task = new Task(id, name, info, status, startTime, duration);
+                return task;
+            case EPIC:
+                Epic epic = new Epic(id, name, info, status, startTime, duration);
+                return epic;
+            case SUBTASK:
+                int idEpicInt = Integer.parseInt(idEpicStr);
+                Subtask subtask = new Subtask(id, name, info, status, startTime, duration, idEpicInt);
+                return subtask;
+            default:
+                return null;
+        }
+    }
+
+
+    enum Endpoint {
+        GET_TASKS, GET_TASKS_BY_ID, GET_PRIOR_TASKS, DELETE_TASKS, DELETE_TASK_BY_ID, POST_TASK, GET_TASKS_HISTORY, UNKNOWN
+    }
 }

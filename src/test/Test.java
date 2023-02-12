@@ -1,5 +1,6 @@
 package test;
 
+import controller.FileBackedTasksManager;
 import controller.TZ8.HttpTaskManager;
 import controller.TZ8.HttpTaskServer;
 import controller.InMemoryHistoryManager;
@@ -11,13 +12,16 @@ import utils.Manager;
 
 import java.io.IOException;
 
-public class FileBackedTasksManager {
+public class Test {
     static String name ="/tasks";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         new KVServer().start();
         InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
-        HttpTaskManager  manager1 = new HttpTaskManager("http://localhost:8078");
+
+        HttpTaskManager manager1 = Manager.isDefaultHttp();
+
+        /*FileBackedTasksManager manager1 = Manager.isDefaultFile();*/
 
         boolean checkSaveOrRead = true; //переключатель для удобства проверки True записывает False считывает
 
@@ -68,7 +72,7 @@ public class FileBackedTasksManager {
             System.out.println(manager1.getTaskHashMap());
             System.out.println(historyManager.getMapHistory());
         }
-        HttpTaskServer taskServer = new HttpTaskServer(name);
+        HttpTaskServer taskServer = new HttpTaskServer(manager1,name);
 
 
     }

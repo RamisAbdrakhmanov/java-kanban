@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Epic extends Task {
-    private final List<Subtask> subtasks;
-    LocalDateTime endTime;
+    transient private final List<Subtask> subtasks;
+    transient LocalDateTime endTime;
 
 
     public Epic(String name, String info, String startTime, String during) {

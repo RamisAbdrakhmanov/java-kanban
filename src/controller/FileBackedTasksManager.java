@@ -7,7 +7,6 @@ import model.TaskEnum;
 import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
-import utils.Manager;
 
 import java.io.*;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private static final InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
 
     private final String filename = "TasksBase";
 
@@ -53,6 +51,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
             String history = br.readLine();
 
+
             List<Integer> historyId = historyFromString(history);
             historyId.forEach(this::addTaskInHistory);
 
@@ -61,10 +60,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    static String historyToString() {
+    String historyToString() {
         List<String> listId = new ArrayList<>();
 
-        for (Task task : FileBackedTasksManager.historyManager.getHistory()) {
+        for (Task task : super.historyManager.getHistory()) {
             String id = String.valueOf(task.getId());
             listId.add(id);
         }
@@ -86,7 +85,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void addTaskInHistory(int id) {
         Task task = this.getTaskById(id);
-        historyManager.addTaskInHistory(task);
+        super.historyManager.addTaskInHistory(task);
     }
 
     public Task fromString(String value) {
@@ -207,12 +206,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     // очистка истории
     public void clearHistory() {
-        for (Task task : getTasks()) {
-            historyManager.remove(task.getId());
-        }
+      super.historyManager.last = null;
+      super.historyManager.first = null;
     }
     public List<Integer> getHistory(){
-        List<Integer> history = historyManager.getHistory().stream().map(Task::getId).collect(Collectors.toList());
+        List<Integer> history =  super.historyManager.getHistory().stream().map(Task::getId).collect(Collectors.toList());
         return history;
     }
 

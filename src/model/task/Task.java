@@ -16,7 +16,7 @@ public class Task {
     private TaskEnum taskEnum;
     private long duration;
     private LocalDateTime startTime;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    private transient final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Task(String name, String info, String startTime, String duration) {
         this.name = name;
@@ -95,13 +95,15 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", info='" + info + '\'' +
                 ", status=" + status +
-                ", id=" + id +
+                ", taskEnum=" + taskEnum +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
-
 
     @Override
     public int hashCode() {
