@@ -35,7 +35,7 @@ public class Manager {
         return fileManager;
     }
 
-    public static HttpTaskManager isDefaultHttp()  {
+    public static HttpTaskManager isDefaultHttp() {
         if (httpTaskManager == null) {
             try {
                 httpTaskManager = new HttpTaskManager();

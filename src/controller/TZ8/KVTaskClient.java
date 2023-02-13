@@ -26,7 +26,7 @@ public class KVTaskClient {
                 HttpResponse.BodyHandlers.ofString()
         );
         apiToken = response.body();
-        }
+    }
 
     void put(String key, String json) {
         URI uri = URI.create(this.uriString + "/save/" + key + "?API_TOKEN=" + apiToken);
@@ -52,7 +52,7 @@ public class KVTaskClient {
 
     }
 
-    String load(String key) throws IOException, InterruptedException {
+    String load(String key) {
         URI uri = URI.create(uriString + "/load/" + key + "?API_TOKEN=" + apiToken);
 
         HttpRequest request = HttpRequest.newBuilder()

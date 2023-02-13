@@ -17,8 +17,7 @@ public class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
     }
 
     @BeforeEach
-    public void beforeEach() throws IOException {
-
+    public void beforeEach() {
         try {
             taskManager = new HttpTaskManager();
         } catch (IOException | InterruptedException e) {

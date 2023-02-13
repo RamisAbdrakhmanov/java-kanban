@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
-
 
 import adapter.LocalDateTimeAdapter;
 import com.google.gson.*;
@@ -20,8 +20,10 @@ import model.task.Epic;
 import model.task.Subtask;
 import model.task.Task;
 
-
 public class TaskHandler implements HttpHandler {
+
+    //я не стал реализовывать метод показа отдельно сабтаска по запросу или епика, мне показалось, что это для тех
+    // у кого они разделены по листам, у меня же все сразу может показать tasks/task/id.
 
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static final Gson gson = new GsonBuilder()
@@ -33,7 +35,7 @@ public class TaskHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange){
+    public void handle(HttpExchange exchange) {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
 
         switch (endpoint) {
@@ -58,16 +60,16 @@ public class TaskHandler implements HttpHandler {
             case GET_TASKS_HISTORY:
                 getHistory(exchange);
                 break;
+            case GET_EPIC_TASKS:
+                getEpicsTasks(exchange);
+                break;
             default:
                 writeResponse(exchange, "Такого эндпоинта не существует", 404);
         }
-
-
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] pathParts = requestPath.split("/");
-
 
         if (pathParts.length == 2 && pathParts[1].equals("tasks")) {
             return Endpoint.GET_PRIOR_TASKS;
@@ -104,7 +106,12 @@ public class TaskHandler implements HttpHandler {
             return Endpoint.GET_TASKS_HISTORY;
         }
 
-
+        if (pathParts.length == 4
+                && pathParts[1].equals("tasks")
+                && pathParts[2].equals("epic")
+                && !(pathParts[3].isBlank())) {
+            return Endpoint.GET_EPIC_TASKS;
+        }
         return Endpoint.UNKNOWN;
     }
 
@@ -126,13 +133,32 @@ public class TaskHandler implements HttpHandler {
 
     public void getTasks(HttpExchange exchange) {
         writeResponse(exchange, gson.toJson(manager.getTasks()), 200);
-
     }
 
     public void getPrioritizedTasks(HttpExchange exchange) {
         writeResponse(exchange, gson.toJson(manager.getPrioritizedTasks()), 200);
     }
 
+    public void getEpicsTasks(HttpExchange exchange) {
+        Optional<Integer> taskIdOpt = getTaskId(exchange);
+        if (taskIdOpt.isEmpty()) {
+            writeResponse(exchange, "Некорректный идентификатор задачи", 400);
+            return;
+        }
+        int taskId = taskIdOpt.get();
+        Task task = manager.getTaskById(taskId);
+        if (task == null) {
+            writeResponse(exchange, "Задача с идентификатором " + taskId + " не найден", 404);
+            return;
+        }
+        if (task.getTaskEnum() != TaskEnum.EPIC) {
+            writeResponse(exchange, "Задача с идентификатором " + taskId + " не является Epic", 400);
+            return;
+        }
+        Epic epic = (Epic) task;
+        List<Subtask> subtasks = manager.subtasks(epic);
+        writeResponse(exchange, gson.toJson(subtasks), 200);
+    }
 
     public void deleteTaskById(HttpExchange exchange) {
         Optional<Integer> taskIdOpt = getTaskId(exchange);
@@ -173,7 +199,6 @@ public class TaskHandler implements HttpHandler {
     public void getHistory(HttpExchange exchange) {
         writeResponse(exchange, gson.toJson(manager.getHistory()), 200);
     }
-
 
     private Optional<Integer> getTaskId(HttpExchange exchange) {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
@@ -217,22 +242,19 @@ public class TaskHandler implements HttpHandler {
 
         switch (taskType) {
             case TASK:
-                Task task = new Task(id, name, info, status, startTime, duration);
-                return task;
+                return new Task(id, name, info, status, startTime, duration);
             case EPIC:
-                Epic epic = new Epic(id, name, info, status, startTime, duration);
-                return epic;
+                return new Epic(id, name, info, status, startTime, duration);
             case SUBTASK:
                 int idEpicInt = Integer.parseInt(idEpicStr);
-                Subtask subtask = new Subtask(id, name, info, status, startTime, duration, idEpicInt);
-                return subtask;
+                return new Subtask(id, name, info, status, startTime, duration, idEpicInt);
             default:
                 return null;
         }
     }
 
-
     enum Endpoint {
-        GET_TASKS, GET_TASKS_BY_ID, GET_PRIOR_TASKS, DELETE_TASKS, DELETE_TASK_BY_ID, POST_TASK, GET_TASKS_HISTORY, UNKNOWN
+        GET_TASKS, GET_TASKS_BY_ID, GET_PRIOR_TASKS, DELETE_TASKS, DELETE_TASK_BY_ID, POST_TASK,
+        GET_TASKS_HISTORY, GET_EPIC_TASKS, UNKNOWN
     }
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
 public class Test {
     static String name ="/tasks";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         new KVServer().start();
         InMemoryHistoryManager historyManager = Manager.getDefaultHistory();
 
@@ -73,6 +73,7 @@ public class Test {
             System.out.println(historyManager.getMapHistory());
         }
         HttpTaskServer taskServer = new HttpTaskServer(manager1,name);
+        taskServer.serverStop();
 
 
     }

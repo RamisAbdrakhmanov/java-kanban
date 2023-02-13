@@ -1,4 +1,5 @@
 package controller.TZ8;
+
 import adapter.InstantAdapter;
 import adapter.LocalDateTimeAdapter;
 import com.google.gson.*;
@@ -22,8 +23,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
 
     public HttpTaskManager() throws IOException, InterruptedException {
         super();
-       client = new KVTaskClient("http://localhost:8078");
-        try{
+        client = new KVTaskClient("http://localhost:8078");
+        try {
             JsonElement jsonTasks = JsonParser.parseString(client.load(kTask));
             if (!jsonTasks.isJsonNull()) {
                 Type typeToken = new TypeToken<ArrayList<Task>>() {
@@ -40,13 +41,13 @@ public class HttpTaskManager extends FileBackedTasksManager {
                     this.getTaskById(taskId);
                 }
             }
-    } catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             System.out.println("Попытка считать из пустого токина!");
         }
 
     }
 
-     @Override
+    @Override
     public void save() {
         client.put(kTask, gson.toJson(getTaskHashMap().values()));
         client.put(kHistory, gson.toJson(new ArrayList<>(getHistory())));

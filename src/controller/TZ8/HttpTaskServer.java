@@ -1,6 +1,7 @@
 package controller.TZ8;
 
 import com.sun.net.httpserver.HttpServer;
+import controller.FileBackedTasksManager;
 import controller.TaskManager;
 
 import java.io.IOException;
@@ -20,7 +21,9 @@ public class HttpTaskServer {
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
 
-    public void serverStop(){
+    public void serverStop() {
         httpServer.stop(0);
+
+        System.out.println("HTTP-сервер остановлен на " + PORT + " порту!");
     }
 }

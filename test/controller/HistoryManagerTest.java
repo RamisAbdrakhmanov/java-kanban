@@ -18,7 +18,6 @@ class HistoryManagerTest {
     private static InMemoryHistoryManager historyManager;
     private static Task task1;
 
-
     @BeforeAll
     static void addTaskInHistoryTest() {
         historyManager = Manager.getDefaultHistory();
@@ -68,14 +67,11 @@ class HistoryManagerTest {
         assertEquals(4, historyManager.getHistory().get(0).getId(), "История не совпадает");
     }
 
-
     @Test
     void removeTest() {
         historyManager.remove(task1.getId());
         assertNull(historyManager.getMapHistory().get(task1.getId()), "Элемент не удален");
-
     }
-
 
     @Test
     void removeNullTest() {
@@ -86,7 +82,6 @@ class HistoryManagerTest {
         assertEquals("no message resource found for message id: " +
                         "Error remove by id in History: java.lang.NullPointerException"
                 , runtimeException.getMessage(), "Удаления из пустого списка неверно");
-
     }
 
     @Test
@@ -105,6 +100,4 @@ class HistoryManagerTest {
         List<Integer> list = historyManagerNull.getHistory().stream().map(Task::getId).collect(Collectors.toList());
         assertEquals(idList, list, "Пустая история просмотров не совпадает");
     }
-
-
 }

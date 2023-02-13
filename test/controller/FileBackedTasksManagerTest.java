@@ -6,7 +6,6 @@ import model.task.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +16,6 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     public void beforeEach() {
         taskManager = new FileBackedTasksManager();
     }
-
 
     @Test
     public void saveAndReadTest() {
@@ -48,9 +46,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     void readNullTest() {
         FileBackedTasksManager taskManager = new FileBackedTasksManager();
-
         NullPointerException exception = assertThrows(NullPointerException.class, taskManager::read);
-
         assertEquals(new NullPointerException().getMessage(), exception.getMessage());
     }
 
