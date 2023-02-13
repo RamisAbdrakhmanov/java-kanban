@@ -1,6 +1,5 @@
 package test;
 
-import controller.FileBackedTasksManager;
 import controller.TZ8.HttpTaskManager;
 import controller.TZ8.HttpTaskServer;
 import controller.InMemoryHistoryManager;
